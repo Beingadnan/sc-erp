@@ -1,6 +1,6 @@
 import type { AttendanceStatus, DayInfo } from '@/lib/api';
 
-export const STATUS_ORDER: AttendanceStatus[] = ['present', 'absent', 'late', 'half_day', 'leave'];
+export const STATUS_ORDER: AttendanceStatus[] = ['present', 'absent', 'late'];
 
 export const STATUS_META: Record<
   AttendanceStatus,
@@ -23,18 +23,6 @@ export const STATUS_META: Record<
     short: 'L',
     on: 'bg-amber-500 text-white border-amber-500',
     cell: 'text-amber-700',
-  },
-  half_day: {
-    label: 'Half day',
-    short: '½',
-    on: 'bg-sky-600 text-white border-sky-600',
-    cell: 'text-sky-700',
-  },
-  leave: {
-    label: 'Leave',
-    short: 'Lv',
-    on: 'bg-slate-600 text-white border-slate-600',
-    cell: 'text-slate-500',
   },
 };
 

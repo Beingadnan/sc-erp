@@ -387,8 +387,8 @@ export class AttendanceService {
               name: fullName(x.firstName, x.lastName),
               admissionNumber: x.admissionNumber,
               onLeave: leave.has(x.studentId),
-              status: m?.status ?? (leave.has(x.studentId) ? 'leave' : 'present'),
-              remark: m?.remark ?? '',
+              status: m?.status ?? (leave.has(x.studentId) ? 'absent' : 'present'),
+              remark: m?.remark ?? (leave.has(x.studentId) ? 'On leave' : ''),
               marked: !!m,
             };
           }),
@@ -1217,46 +1217,28 @@ export class AttendanceService {
         })
         .where(eq(lv.id, id));
 
-      // Registers already taken for those days follow the decision, with history.
+      // Registers keep Absent for leave days (there are only Present / Absent / Late);
+      // the note on those days follows the decision.
       let changed = 0;
       if (
         input.status === 'approved' ||
         (input.status === 'cancelled' && leave.status === 'approved')
       ) {
-        const target = input.status === 'approved' ? 'leave' : 'absent';
+        const approving = input.status === 'approved';
         const rows = await tx
-          .select({ id: rec.id, status: rec.status })
-          .from(rec)
+          .update(rec)
+          .set({ remark: approving ? 'On leave' : '' })
           .where(
             and(
               eq(rec.studentId, leave.studentId),
               gte(rec.onDate, leave.fromDate),
               lte(rec.onDate, leave.toDate),
-              input.status === 'approved' ? eq(rec.status, 'absent') : eq(rec.status, 'leave'),
+              eq(rec.status, 'absent'),
+              approving ? eq(rec.remark, '') : eq(rec.remark, 'On leave'),
             ),
-          );
-        if (rows.length) {
-          await tx
-            .update(rec)
-            .set({ status: target })
-            .where(
-              inArray(
-                rec.id,
-                rows.map((r) => r.id),
-              ),
-            );
-          await tx.insert(cor).values(
-            rows.map((r) => ({
-              tenantId: access.tenantId,
-              recordId: r.id,
-              fromStatus: r.status,
-              toStatus: target,
-              reason: input.status === 'approved' ? 'Leave approved' : 'Leave cancelled',
-              correctedBy: access.userId,
-            })),
-          );
-          changed = rows.length;
-        }
+          )
+          .returning({ id: rec.id });
+        changed = rows.length;
       }
       await this.audit.record(tx, access, {
         action: `attendance.leave_${input.status}`,

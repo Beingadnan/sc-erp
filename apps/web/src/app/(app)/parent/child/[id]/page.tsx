@@ -17,9 +17,7 @@ import { MARK_SHORT, fmtMarks } from '@/components/exams/labels';
 const CELL: Record<string, string> = {
   present: 'bg-emerald-500 text-white',
   late: 'bg-amber-400 text-white',
-  half_day: 'bg-amber-200 text-amber-900',
   absent: 'bg-red-500 text-white',
-  leave: 'bg-sky-400 text-white',
 };
 const DEMAND_TONE = {
   due: 'amber',
@@ -144,8 +142,6 @@ function Attendance({ id }: { id: string }) {
           {[
             ['Absent', t.absent],
             ['Late', t.late],
-            ['Half day', t.halfDays],
-            ['Leave', t.leave],
           ].map(([l, n]) => (
             <div key={l} className="rounded-lg bg-slate-50 py-2">
               <div className="text-base font-semibold">{n}</div>

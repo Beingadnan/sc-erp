@@ -12,6 +12,11 @@ describe('attendance rules', () => {
 
   it('validates registers and leave', () => {
     const id = '01920000-0000-7000-8000-000000000001';
+    // Three marks only: Present, Absent, Late.
+    for (const status of ['half_day', 'leave'])
+      expect(
+        markAttendanceSchema.safeParse({ records: [{ enrollmentId: id, status }] }).success,
+      ).toBe(false);
     expect(
       markAttendanceSchema.safeParse({
         records: [

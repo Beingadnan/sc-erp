@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { isoDateSchema } from './academic.js';
 
-export const ATTENDANCE_STATUSES = ['present', 'absent', 'late', 'half_day', 'leave'] as const;
+/** A register has three marks only: Present, Absent, Late. */
+export const ATTENDANCE_STATUSES = ['present', 'absent', 'late'] as const;
 export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
 
 /** Attended value of one record: present/late 1, half day 0.5, absent 0; leave depends on the setting. */

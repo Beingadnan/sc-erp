@@ -1,0 +1,2 @@
+ALTER TABLE "student_attendance" DROP CONSTRAINT "student_attendance_status_chk";--> statement-breakpoint
+ALTER TABLE "student_attendance" ADD CONSTRAINT "student_attendance_status_chk" CHECK ("student_attendance"."status" in ('present', 'absent', 'late'));

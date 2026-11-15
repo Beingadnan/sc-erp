@@ -228,7 +228,7 @@ export default function TodayPage() {
     totals && totals.students && totals.marked
       ? Math.round(
           ((totals.present + totals.late) /
-            Math.max(1, totals.present + totals.late + totals.absent + totals.leave)) *
+            Math.max(1, totals.present + totals.late + totals.absent)) *
             100,
         )
       : null;
@@ -366,7 +366,7 @@ export default function TodayPage() {
               href="/attendance"
               value={working ? totals.absent : '—'}
               tone={totals.absent ? 'warn' : undefined}
-              sub={working ? `${totals.leave} on leave · ${totals.late} late` : 'No school today'}
+              sub={working ? `${totals.late} late` : 'No school today'}
             />
           )}
         </section>

@@ -148,8 +148,6 @@ function Register({
       present: 0,
       absent: 0,
       late: 0,
-      half_day: 0,
-      leave: 0,
     };
     for (const m of Object.values(marks)) c[m.status] += 1;
     return c;
@@ -177,12 +175,15 @@ function Register({
   const setAll = (status: AttendanceStatus) => {
     if (!r) return;
     setSaved(null);
-    // Students on approved leave keep "leave".
+    // Students on approved leave stay Absent.
     setMarks(
       Object.fromEntries(
         r.students.map((s) => [
           s.enrollmentId,
-          { status: s.onLeave ? 'leave' : status, remark: marks[s.enrollmentId]?.remark ?? '' },
+          {
+            status: s.onLeave ? ('absent' as const) : status,
+            remark: marks[s.enrollmentId]?.remark || (s.onLeave ? 'On leave' : ''),
+          },
         ]),
       ),
     );
@@ -355,7 +356,7 @@ function Register({
                           {s.onLeave && (
                             <>
                               {' '}
-                              · <span className="text-slate-700">approved leave</span>
+                              · <span className="text-slate-700">on approved leave</span>
                             </>
                           )}
                           {m.remark && <> · {m.remark}</>}

@@ -168,8 +168,9 @@ sections are 404.
 | `POST /attendance/leave`                                              | attendance.mark (own) / attendance.correct | `{studentId, fromDate, toDate, reason, requestedVia}`; ≤ 61 days; no overlaps                                                                                                                                                                             |
 | `POST /attendance/leave/:id/decision`                                 | attendance.mark (own) / attendance.correct | `{status: approved\|rejected\|cancelled, note}`; approval turns marked absences into leave, cancelling turns them back to absent (both recorded as corrections)                                                                                           |
 
-Statuses: present, absent, late (counts present), half_day (0.5), leave (not counted, or absent
-by setting). Period 0 = daily register; in period mode periods 1…n.
+Statuses: present, absent, late (counts present). Only these three are accepted. A student on
+approved leave is marked absent with the note "On leave" (migration 0034 converted old half_day to
+present and old leave to absent). Period 0 = daily register; in period mode periods 1…n.
 
 ## Fees — setup, concessions, demands (Phase 6a)
 

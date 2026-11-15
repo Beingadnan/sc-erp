@@ -30,7 +30,7 @@ const tenantId = () =>
     .notNull()
     .references(() => tenants.id, { onDelete: 'cascade' });
 
-export const ATTENDANCE_STATUSES = ['present', 'absent', 'late', 'half_day', 'leave'] as const;
+export const ATTENDANCE_STATUSES = ['present', 'absent', 'late'] as const;
 
 /** Per-campus rules. A campus without a row uses the defaults. */
 export const attendanceSettings = pgTable(
@@ -127,7 +127,7 @@ export const studentAttendance = pgTable(
     }),
     check(
       'student_attendance_status_chk',
-      sql`${t.status} in ('present', 'absent', 'late', 'half_day', 'leave')`,
+      sql`${t.status} in ('present', 'absent', 'late')`,
     ),
     check('student_attendance_remark_chk', sql`length(${t.remark}) <= 200`),
   ],

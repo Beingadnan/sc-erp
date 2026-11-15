@@ -15,3 +15,13 @@ coverage/
 next-env.d.ts
 .dev-mail/
 .storage/
+
+# local-only files (demo logins, logs, backups, delivery checksums)
+demo-logins.txt
+dev-log.txt
+*.zip
+*.sha256
+*.bak
+.ui-backup/
+tmpstage/
+.vercel

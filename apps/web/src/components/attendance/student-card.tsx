@@ -62,7 +62,7 @@ export function AttendanceCard({ studentId }: { studentId: string }) {
           </div>
           <p className="text-slate-600">
             {d.totals.days} day{d.totals.days === 1 ? '' : 's'} · {d.totals.absent} absent ·{' '}
-            {d.totals.late} late · {d.totals.halfDays} half · {d.totals.leave} leave
+            {d.totals.late} late
           </p>
           <div className="flex flex-wrap gap-1.5">
             {d.months.map((m) => (

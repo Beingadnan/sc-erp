@@ -99,8 +99,6 @@ export default function AttendanceTodayPage() {
                 hint={t.totals.late ? `${t.totals.late} late` : undefined}
               />
               <Stat label="Absent" value={t.totals.absent} tone="red" />
-              <Stat label="Half day" value={t.totals.halfDay} />
-              <Stat label="On leave" value={t.totals.leave} />
             </div>
           )}
 
@@ -151,9 +149,6 @@ export default function AttendanceTodayPage() {
                           <span className={s.counts.absent ? 'font-semibold text-red-700' : ''}>
                             {s.counts.absent}
                           </span>
-                          {s.counts.leave ? (
-                            <span className="text-slate-500"> · {s.counts.leave} leave</span>
-                          ) : null}
                         </span>
                       ) : (
                         '—'

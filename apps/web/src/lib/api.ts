@@ -579,7 +579,7 @@ export interface ImportJob {
 
 /* ------------------------------------- attendance ------------------------------------- */
 
-export type AttendanceStatus = 'present' | 'absent' | 'late' | 'half_day' | 'leave';
+export type AttendanceStatus = 'present' | 'absent' | 'late';
 
 export interface AttendanceSettings {
   mode: 'daily' | 'period';

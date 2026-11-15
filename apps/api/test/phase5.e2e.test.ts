@@ -213,12 +213,12 @@ describe('Phase 5: attendance (e2e)', () => {
         teacher.browser,
         secA.id,
         today,
-        all(roster, 'present', { 0: 'absent', 1: 'absent', 2: 'late', 3: 'half_day' }),
+        all(roster, 'present', { 0: 'absent', 1: 'absent', 2: 'late', 3: 'late' }),
       );
       const took = Date.now() - t0;
       expect(res.status, JSON.stringify(res.body)).toBe(200);
       expect(took).toBeLessThan(1000);
-      expect(res.body.counts).toEqual({ present: 41, absent: 2, late: 1, half_day: 1 });
+      expect(res.body.counts).toEqual({ present: 41, absent: 2, late: 2 });
       const ev = await asA(
         `select payload from outbox_events where tenant_id = $1 and event_type = 'attendance.absent'`,
         [A.tenantId],
@@ -231,7 +231,7 @@ describe('Phase 5: attendance (e2e)', () => {
         teacher.browser,
         secA.id,
         today,
-        all(roster, 'present', { 0: 'absent', 1: 'present', 2: 'late', 3: 'half_day' }),
+        all(roster, 'present', { 0: 'absent', 1: 'present', 2: 'late', 3: 'late' }),
       );
       expect(again.status).toBe(200);
       expect(again.body).toMatchObject({ created: false, changed: 1, corrected: 0 });
@@ -302,7 +302,7 @@ describe('Phase 5: attendance (e2e)', () => {
       );
       const reg = await register(teacher.browser, secA.id, today);
       expect(reg.body).toMatchObject({ locked: true, canEdit: false });
-      const records = all(roster, 'present', { 0: 'present', 2: 'late', 3: 'half_day' });
+      const records = all(roster, 'present', { 0: 'present', 2: 'late', 3: 'late' });
       expect((await save(teacher.browser, secA.id, today, records)).status).toBe(403);
 
       const noReason = await save(A.browser, secA.id, today, records);
@@ -414,14 +414,17 @@ describe('Phase 5: attendance (e2e)', () => {
       expect(ok.status, JSON.stringify(ok.body)).toBe(200);
       expect(ok.body.recordsChanged).toBe(1);
       const reg = await register(A.browser, secA.id, d(6));
+      // Registers keep Absent (three marks only); the day gets an "On leave" note.
       expect((reg.body.students as RegisterStudent[])[5]).toMatchObject({
-        status: 'leave',
+        status: 'absent',
+        remark: 'On leave',
         onLeave: true,
       });
-      // A day not yet marked defaults to leave.
+      // A day not yet marked defaults to absent, on leave.
       const unmarked = await register(A.browser, secA.id, d(7));
       expect((unmarked.body.students as RegisterStudent[])[5]).toMatchObject({
-        status: 'leave',
+        status: 'absent',
+        remark: 'On leave',
         marked: false,
       });
       expect(
@@ -433,17 +436,18 @@ describe('Phase 5: attendance (e2e)', () => {
       ).toBe(409);
     });
 
-    it('cancelling approved leave reverts marked days to absent, with history', async () => {
+    it('cancelling approved leave clears the leave note', async () => {
       const res = await A.browser.post(`/attendance/leave/${leaveId}/decision`, {
         status: 'cancelled',
         note: 'Came to school',
       });
       expect(res.status).toBe(200);
       expect(res.body.recordsChanged).toBe(1);
-      const hist = await A.browser.get(
-        `/attendance/sections/${secA.id}/history?date=${d(6)}&period=0`,
-      );
-      expect(hist.body.map((h: Row) => h.reason)).toEqual(['Leave approved', 'Leave cancelled']);
+      const reg = await register(A.browser, secA.id, d(6));
+      expect((reg.body.students as RegisterStudent[])[5]).toMatchObject({
+        status: 'absent',
+        remark: '',
+      });
     });
 
     it('teachers cannot record leave for other sections', async () => {
@@ -506,7 +510,7 @@ describe('Phase 5: attendance (e2e)', () => {
       expect(res.status).toBe(200);
       expect(res.body.totals).toMatchObject({ sections: 2, marked: 1, students: 46 });
       const row = res.body.sections.find((x: Row) => x.sectionId === secA.id);
-      expect(row.counts).toMatchObject({ absent: 0, late: 1, halfDay: 1, present: 43 });
+      expect(row.counts).toMatchObject({ absent: 0, late: 2, present: 43 });
       expect(row.periodsMarked).toEqual([3]);
       const mine = await teacher.browser.get(`/attendance/today?campusId=${A.campusId}`);
       expect(mine.body.sections.map((x: Row) => x.sectionId)).toEqual([secA.id]);

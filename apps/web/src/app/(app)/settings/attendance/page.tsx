@@ -97,14 +97,8 @@ export default function AttendanceSettingsPage() {
                 error={f.lowThreshold}
                 hint="CBSE generally expects 75% attendance to sit board exams."
               />
-              <SelectField
-                label="Approved leave in percentages"
-                name="leaveCountsAs"
-                defaultValue={s.leaveCountsAs}
-              >
-                <option value="excluded">Leave days are not counted</option>
-                <option value="absent">Leave days count as absent</option>
-              </SelectField>
+              {/* Registers have no "leave" mark any more; kept only so the saved setting is unchanged. */}
+              <input type="hidden" name="leaveCountsAs" value={s.leaveCountsAs} />
             </fieldset>
             {!editable && (
               <Alert tone="info">
