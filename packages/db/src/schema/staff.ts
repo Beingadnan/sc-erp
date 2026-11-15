@@ -45,7 +45,10 @@ export const staffProfiles = pgTable(
       columns: [t.tenantId, t.membershipId],
       foreignColumns: [tenantMemberships.tenantId, tenantMemberships.id],
     }).onDelete('cascade'),
-    check('staff_profiles_phone_chk', sql`${t.phone} is null or ${t.phone} ~ '^\\+[1-9][0-9]{7,14}$'`),
+    check(
+      'staff_profiles_phone_chk',
+      sql`${t.phone} is null or ${t.phone} ~ '^\\+[1-9][0-9]{7,14}$'`,
+    ),
   ],
 );
 

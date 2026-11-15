@@ -125,10 +125,7 @@ export const studentAttendance = pgTable(
       columns: [t.tenantId, t.studentId],
       foreignColumns: [students.tenantId, students.id],
     }),
-    check(
-      'student_attendance_status_chk',
-      sql`${t.status} in ('present', 'absent', 'late')`,
-    ),
+    check('student_attendance_status_chk', sql`${t.status} in ('present', 'absent', 'late')`),
     check('student_attendance_remark_chk', sql`length(${t.remark}) <= 200`),
   ],
 );

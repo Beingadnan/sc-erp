@@ -127,7 +127,6 @@ describe('receipts', () => {
   });
 });
 
-
 describe('pay to school', () => {
   it('builds a UPI link with the amount in rupees', () => {
     expect(upiPayUri({ upiId: 'school@okhdfc', payeeName: 'Sunrise School', amount: 150050 })).toBe(

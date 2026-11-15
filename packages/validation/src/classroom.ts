@@ -17,7 +17,10 @@ export const periodSlotsSchema = z.object({
           endsAt: hhmm,
           isBreak: z.boolean().default(false),
         })
-        .refine((s) => s.endsAt > s.startsAt, { message: 'Ends before it starts', path: ['endsAt'] }),
+        .refine((s) => s.endsAt > s.startsAt, {
+          message: 'Ends before it starts',
+          path: ['endsAt'],
+        }),
     )
     .min(1)
     .max(16)

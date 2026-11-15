@@ -4,7 +4,7 @@
 
 - **Academics → Timetable.** Set the **bell** once (starts from a usual 8-period day with short
   break and lunch; edit times, add/remove periods, mark breaks). Then pick a class and click a cell
-  to choose the subject; the teacher fills in from *Who teaches what* and can be changed. A teacher
+  to choose the subject; the teacher fills in from _Who teaches what_ and can be changed. A teacher
   cannot be put in two classes in the same period ("Sushma Rao already teaches Class 5 A in Period 1
   on Mon"). Breaks and subjects not taught in the class are refused.
 - **Academics → Substitutions.** Morning job: pick the date and the absent teacher; each of their

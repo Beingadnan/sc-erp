@@ -7,7 +7,10 @@ export const parentPasswordSchema = z
   .min(8, 'Use at least 8 characters')
   .max(128, 'Use at most 128 characters')
   .refine((p) => !/^(.)\1+$/.test(p), 'Do not repeat one character')
-  .refine((p) => !/^(0123456789|12345678|password|abcdefgh)/i.test(p), 'Choose a less common password');
+  .refine(
+    (p) => !/^(0123456789|12345678|password|abcdefgh)/i.test(p),
+    'Choose a less common password',
+  );
 
 export const portalInviteSchema = z.object({
   guardianId: z.uuid(),

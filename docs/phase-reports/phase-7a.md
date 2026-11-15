@@ -4,8 +4,8 @@
 
 - **Sign in with a mobile number.** Staff keep using email; parents use the mobile number the
   school has for them. Users may now have no email (`users.login_phone`, unique).
-- **Giving access (student page → Parent app access).** Each guardian shows *No access*,
-  *Invited* or *Has access* (with last sign-in). **Give access** makes a one-time link valid 7 days,
+- **Giving access (student page → Parent app access).** Each guardian shows _No access_,
+  _Invited_ or _Has access_ (with last sign-in). **Give access** makes a one-time link valid 7 days,
   with **Send on WhatsApp** (guardian's number and a ready message) and **Copy link**. Also
   **Password reset link** (2 days) and **Remove access**.
 - **Activation page `/portal/activate`.** The parent sees the school and their first name, sets a

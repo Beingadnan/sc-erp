@@ -86,10 +86,7 @@ import { SetupImportController } from './setup/setup-import.controller.js';
 import { SetupImportService } from './setup/setup-import.service.js';
 import { OpeningBalancesController } from './setup/opening.controller.js';
 import { OpeningBalancesService } from './setup/opening.service.js';
-import {
-  ClassroomController,
-  NoticesController,
-} from './classroom/classroom.controllers.js';
+import { ClassroomController, NoticesController } from './classroom/classroom.controllers.js';
 import { ClassroomService } from './classroom/classroom.service.js';
 import { ExamsController } from './exams/exams.controller.js';
 import { ExamsService } from './exams/exams.service.js';

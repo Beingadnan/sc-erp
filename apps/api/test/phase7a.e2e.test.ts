@@ -258,24 +258,29 @@ describe('Phase 7a: parent portal (e2e)', () => {
     });
 
     it('shows attendance marked by the school', async () => {
+      // Weekends are off, so mark the latest weekday (today on a school day).
+      let day = today;
+      while ([0, 6].includes(new Date(`${day}T00:00:00Z`).getUTCDay())) day = shift(day, -1);
       const reg = (
-        await A.browser.get(`/attendance/sections/${sectionId}/register?date=${today}&period=0`)
+        await A.browser.get(`/attendance/sections/${sectionId}/register?date=${day}&period=0`)
       ).body;
       const records = reg.students.map((s: { enrollmentId: string; studentId: string }) => ({
         enrollmentId: s.enrollmentId,
         status: s.studentId === kids[0] ? 'absent' : 'present',
       }));
       const saved = await A.browser.put(
-        `/attendance/sections/${sectionId}/register?date=${today}&period=0`,
+        `/attendance/sections/${sectionId}/register?date=${day}&period=0`,
         { records },
       );
       expect(saved.status, JSON.stringify(saved.body)).toBe(200);
       const att = await parent.get(`/family/children/${kids[0]}/attendance`);
       expect(att.status, JSON.stringify(att.body)).toBe(200);
       expect(att.body.totals).toMatchObject({ days: 1, absent: 1 });
-      expect(att.body.records).toEqual([{ date: today, status: 'absent', remark: '' }]);
+      expect(att.body.records).toEqual([{ date: day, status: 'absent', remark: '' }]);
       const home = await parent.get('/family');
-      expect(home.body.children.find((c: Row) => c.id === kids[0]).todayAttendance).toBe('absent');
+      expect(home.body.children.find((c: Row) => c.id === kids[0]).todayAttendance).toBe(
+        day === today ? 'absent' : null,
+      );
     });
 
     it('shows dues and receipts, and serves only their receipts', async () => {

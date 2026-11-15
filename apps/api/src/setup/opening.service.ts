@@ -60,7 +60,10 @@ export class OpeningBalancesService {
   ) {}
 
   template() {
-    return String.fromCharCode(0xfeff) + 'Admission no,Name,Previous dues,Advance,Note\r\nA-101,Riya Sharma,"4,500",0,Term 4 of last year\r\nA-102,Kabir Singh,0,1200,Paid extra in March\r\n';
+    return (
+      String.fromCharCode(0xfeff) +
+      'Admission no,Name,Previous dues,Advance,Note\r\nA-101,Riya Sharma,"4,500",0,Term 4 of last year\r\nA-102,Kabir Singh,0,1200,Paid extra in March\r\n'
+    );
   }
 
   private async read(file: { buffer: Buffer; originalname: string; size: number } | undefined) {

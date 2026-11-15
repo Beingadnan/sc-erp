@@ -33,7 +33,7 @@ Date: 2026-11-11 · Status: built and tested in the workspace; awaiting live che
 - Uploads: permission is checked before the file is sent anywhere; if saving the record
   fails, the uploaded file is removed again.
 - Tampered or expired file links fail; served files are sandboxed (`Content-Security-Policy:
-  sandbox`, `nosniff`).
+sandbox`, `nosniff`).
 - The API refuses to start in production without a Blob token (no silent local storage).
 
 ## Tests

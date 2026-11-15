@@ -13,7 +13,7 @@
 
 ## School setup workbook (Settings → Import old data)
 
-- **Download template:** an .xlsx with *Read me*, *Classes*, *Subjects*, *Staff*, *Teaching*.
+- **Download template:** an .xlsx with _Read me_, _Classes_, _Subjects_, _Staff_, _Teaching_.
 - **Classes:** one row per section; class written the way schools write it (1, Class 1, I, 1st, Std 1,
   LKG, UKG, Nursery, 11 Science, XII Commerce). Optional class teacher (mobile, email or name).
 - **Subjects:** code optional (made from the name), classes as "All", "1-5", "6, 7, 8", "LKG, UKG".

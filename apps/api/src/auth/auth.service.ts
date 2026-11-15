@@ -263,7 +263,10 @@ export class AuthService {
         .update(schema.users)
         .set({ mfaSecretEnc: this.box.seal(secret), mfaLastStep: null })
         .where(eq(schema.users.id, auth.userId));
-      return { secret, otpauthUrl: otpauthUrl('School ERP', me.email ?? me.loginPhone ?? 'account', secret) };
+      return {
+        secret,
+        otpauthUrl: otpauthUrl('School ERP', me.email ?? me.loginPhone ?? 'account', secret),
+      };
     });
   }
 

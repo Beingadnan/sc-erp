@@ -22,7 +22,9 @@ export function MyPeriodsToday() {
   const now = nowHHMM();
   return (
     <section className="rounded-xl border border-slate-200 bg-white">
-      <h2 className="border-b border-slate-200 px-4 py-3 text-base font-semibold">My periods today</h2>
+      <h2 className="border-b border-slate-200 px-4 py-3 text-base font-semibold">
+        My periods today
+      </h2>
       <ul className="divide-y divide-slate-200">
         {periods.map((p) => {
           const live = p.startsAt <= now && now < p.endsAt;

@@ -36,4 +36,4 @@ Use **Vercel Blob with a private store in the Mumbai region (bom1)**.
 - Costs (bom1): storage about $0.025/GB-month plus operations and transfer — small for
   school documents.
 - Files are encrypted at rest by the provider; we do not add our own file encryption in this
-  phase (Aadhaar *numbers* are encrypted by us separately).
+  phase (Aadhaar _numbers_ are encrypted by us separately).

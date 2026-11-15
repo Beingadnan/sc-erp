@@ -5,16 +5,16 @@ office must be able to set up the school the way the timetable chart on the staf
 
 ## What was built
 
-- **Staff by mobile number** (Settings → Staff & access → Add staff). Choose *Mobile number* (default)
-  or *Email*, plus designation (e.g. "PRT Hindi"). For a mobile, the office gets a link with
+- **Staff by mobile number** (Settings → Staff & access → Add staff). Choose _Mobile number_ (default)
+  or _Email_, plus designation (e.g. "PRT Hindi"). For a mobile, the office gets a link with
   **Send on WhatsApp**; the teacher sets a password and signs in with the mobile. Staff list shows
   designation and mobile. Staff profile (designation, employee code, mobile, joining date) can be
   edited (`PUT /members/:id/profile`).
 - **Who teaches what** (Academics → Who teaches what): one table per class — sections down the side,
-  *Class teacher* and each of the class's subjects across the top, a teacher picker in each cell,
+  _Class teacher_ and each of the class's subjects across the top, a teacher picker in each cell,
   saved as soon as it is picked. A side list shows each teacher's load (class teacher of · subject
   classes). Teachers who have not signed in yet can already be placed.
-- **My classes** for teachers (Today page and the *My classes* menu item): class-teacher section
+- **My classes** for teachers (Today page and the _My classes_ menu item): class-teacher section
   first with "Attendance due/done" and **Take attendance**, then subject classes ("Class 3 B · Hindi").
   **Class list** shows the students of that section.
 - **Strict scope:**

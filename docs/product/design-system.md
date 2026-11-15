@@ -19,26 +19,26 @@ adapted to how Indian schools work on cheap Windows PCs, office laptops and pare
 
 ## Tokens (apps/web/src/app/globals.css)
 
-| Token | Value | Use |
-| --- | --- | --- |
-| Brand | `#0F6CBD` (hover `#115EA3`, pressed `#0F548C`, tint `#EBF3FC`) | primary buttons, links, selected nav, focus |
-| Page background | `#F5F5F5` | behind cards |
-| Surface | `#FFFFFF` with 1 px `#E0E0E0` stroke | cards, tables, dialogs |
-| Text | primary `#242424`, secondary `#616161`, disabled `#BDBDBD` | |
-| Status | success `#107C10`, warning `#BC4B09` / `#FDF6F3`, danger `#C50F1F` / `#FDF3F4`, info brand | badges, alerts |
-| Font | Segoe UI Variable → Segoe UI → system UI, then Noto Sans Devanagari | Windows default, Hindi |
-| Type ramp | 12/16 caption · 14/20 body · 16/22 subtitle · 20/28 section · 24/32 page title (semibold) | |
-| Radius | 4 px controls, 8 px cards, 12 px dialogs | |
-| Spacing | 4 px grid; cards 16–20 px padding; 24 px between sections | |
-| Elevation | cards flat with stroke; menus/dialogs shadow 8/28 | |
+| Token           | Value                                                                                      | Use                                         |
+| --------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| Brand           | `#0F6CBD` (hover `#115EA3`, pressed `#0F548C`, tint `#EBF3FC`)                             | primary buttons, links, selected nav, focus |
+| Page background | `#F5F5F5`                                                                                  | behind cards                                |
+| Surface         | `#FFFFFF` with 1 px `#E0E0E0` stroke                                                       | cards, tables, dialogs                      |
+| Text            | primary `#242424`, secondary `#616161`, disabled `#BDBDBD`                                 |                                             |
+| Status          | success `#107C10`, warning `#BC4B09` / `#FDF6F3`, danger `#C50F1F` / `#FDF3F4`, info brand | badges, alerts                              |
+| Font            | Segoe UI Variable → Segoe UI → system UI, then Noto Sans Devanagari                        | Windows default, Hindi                      |
+| Type ramp       | 12/16 caption · 14/20 body · 16/22 subtitle · 20/28 section · 24/32 page title (semibold)  |                                             |
+| Radius          | 4 px controls, 8 px cards, 12 px dialogs                                                   |                                             |
+| Spacing         | 4 px grid; cards 16–20 px padding; 24 px between sections                                  |                                             |
+| Elevation       | cards flat with stroke; menus/dialogs shadow 8/28                                          |                                             |
 
 Tailwind's `slate-*` and `brand-*` classes map to these values, so existing pages pick them up.
 
 ## Shell
 
 - **Navigation (left, 240 px; 48 px rail when collapsed; drawer on phones).** Grouped like Fluent
-  Nav categories: *Daily* (Today, Attendance, My classes), *Students* (Students, Admissions),
-  *Money* (Fees), *Teaching* (Academics, Exams), *School* (Notices, Website, Settings). Each item
+  Nav categories: _Daily_ (Today, Attendance, My classes), _Students_ (Students, Admissions),
+  _Money_ (Fees), _Teaching_ (Academics, Exams), _School_ (Notices, Website, Settings). Each item
   has an icon; the selected item has a blue indicator bar and a tinted background.
 - **Header.** School name (switcher when several), **Find a student** search for office roles,
   and the account menu.
@@ -54,11 +54,11 @@ dialogs and "Are you sure?" confirmations, toasts, action menus (⋯).
 
 ## Home page per role
 
-| Role | First thing on Today |
-| --- | --- |
+| Role              | First thing on Today                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
 | Owner / principal | Today's attendance %, fees collected today, dues, staff absent; "Needs attention" list; shortcuts |
-| Office admin | Teacher absent? (substitutions), admissions, notices, students |
-| Accountant | Fee counter button, today's collection, pending payment proofs, day closing |
-| Receptionist | New inquiry, send notice, find student |
-| Teacher | My periods today, take attendance for my class, marks to enter, homework |
-| Parent (phone) | Each child as a card with today's attendance, dues and new homework; notices |
+| Office admin      | Teacher absent? (substitutions), admissions, notices, students                                    |
+| Accountant        | Fee counter button, today's collection, pending payment proofs, day closing                       |
+| Receptionist      | New inquiry, send notice, find student                                                            |
+| Teacher           | My periods today, take attendance for my class, marks to enter, homework                          |
+| Parent (phone)    | Each child as a card with today's attendance, dues and new homework; notices                      |

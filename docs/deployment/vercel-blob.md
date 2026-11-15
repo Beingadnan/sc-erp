@@ -5,8 +5,8 @@ app, not for real schools.
 
 1. Sign in at vercel.com → **Storage** → **Create** → **Blob**.
 2. Name it e.g. `school-erp-documents`, set **Access: Private**, **Region: Mumbai (bom1)**.
-   The access mode cannot be changed later, so double-check *Private*.
-3. Open the store → **.env.local** tab (or *Settings → Tokens*) and copy
+   The access mode cannot be changed later, so double-check _Private_.
+3. Open the store → **.env.local** tab (or _Settings → Tokens_) and copy
    `BLOB_READ_WRITE_TOKEN`.
 4. Add it to the project's `.env` (never commit it, never paste it in chat):
    ```

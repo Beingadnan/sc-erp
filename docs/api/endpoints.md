@@ -229,118 +229,118 @@ Receipt numbers: `{CAMPUS CODE}/{financial year}/{5-digit sequence}`, gap-free p
 
 ## Fees — pay to school account, proofs, refunds (Phase 6c)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| GET | /fees/payment-settings?campusId | any fees permission or settings.manage | School bank / UPI details and QR (signed link, 10 min) |
-| PUT | /fees/payment-settings | settings.manage (privileged, MFA) | Audited; account number masked in the audit diff |
-| POST / DELETE | /fees/payment-settings/qr?campusId | settings.manage | Image only (PNG, JPG, WebP, ≤5 MB) |
-| POST | /fees/payment-links | fees.collect | Amount defaults to what is due today; returns the URL once (only its SHA-256 is stored) and a WhatsApp message |
-| GET | /fees/payment-links?campusId&studentId&status | any fees permission | `expired` is derived |
-| POST | /fees/payment-links/:id/cancel | fees.collect | |
-| GET | /fees/payment-proofs?campusId&status&page | any fees permission | Queue of parent uploads |
-| GET | /fees/payment-proofs/:id | any fees permission | Signed 5-minute link to the screenshot; viewing is audited |
-| POST | /fees/payment-proofs/:id/approve | fees.collect | Issues the receipt (mode upi/bank_transfer, reference = UTR); optional corrected amount |
-| POST | /fees/payment-proofs/:id/reject | fees.collect | Note is shown to the parent |
-| GET | /fees/students/:id/refundable | fees.refund | Unused advance and paid refundable deposits |
-| POST | /fees/refunds | fees.refund | Reserves the amount (FIFO across receipts or deposit lines) |
-| GET | /fees/refunds?campusId&status&studentId | any fees permission or fees.refund | |
-| POST | /fees/refunds/:id/pay | fees.cancel_receipt, not the requester | Numbers `RF/{campus}/{FY}/{00001}`, posts the ledger journal |
-| POST | /fees/refunds/:id/reject | fees.cancel_receipt | |
-| GET | /public/pay/:token | public, rate-limited | Parent page data: student first name and class, amount, school account, UPI link, uploads |
-| POST | /public/pay/:token/proof | public, rate-limited (20/h per IP, 10/h per link) | multipart: file, amount, mode, reference (UTR), paidOn, payerName, payerPhone; duplicate UTR → 409 |
-| GET | /public/pay/:token/receipts/:proofId | public | Receipt PDF after approval |
+| Method        | Path                                          | Permission                                        | Notes                                                                                                          |
+| ------------- | --------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| GET           | /fees/payment-settings?campusId               | any fees permission or settings.manage            | School bank / UPI details and QR (signed link, 10 min)                                                         |
+| PUT           | /fees/payment-settings                        | settings.manage (privileged, MFA)                 | Audited; account number masked in the audit diff                                                               |
+| POST / DELETE | /fees/payment-settings/qr?campusId            | settings.manage                                   | Image only (PNG, JPG, WebP, ≤5 MB)                                                                             |
+| POST          | /fees/payment-links                           | fees.collect                                      | Amount defaults to what is due today; returns the URL once (only its SHA-256 is stored) and a WhatsApp message |
+| GET           | /fees/payment-links?campusId&studentId&status | any fees permission                               | `expired` is derived                                                                                           |
+| POST          | /fees/payment-links/:id/cancel                | fees.collect                                      |                                                                                                                |
+| GET           | /fees/payment-proofs?campusId&status&page     | any fees permission                               | Queue of parent uploads                                                                                        |
+| GET           | /fees/payment-proofs/:id                      | any fees permission                               | Signed 5-minute link to the screenshot; viewing is audited                                                     |
+| POST          | /fees/payment-proofs/:id/approve              | fees.collect                                      | Issues the receipt (mode upi/bank_transfer, reference = UTR); optional corrected amount                        |
+| POST          | /fees/payment-proofs/:id/reject               | fees.collect                                      | Note is shown to the parent                                                                                    |
+| GET           | /fees/students/:id/refundable                 | fees.refund                                       | Unused advance and paid refundable deposits                                                                    |
+| POST          | /fees/refunds                                 | fees.refund                                       | Reserves the amount (FIFO across receipts or deposit lines)                                                    |
+| GET           | /fees/refunds?campusId&status&studentId       | any fees permission or fees.refund                |                                                                                                                |
+| POST          | /fees/refunds/:id/pay                         | fees.cancel_receipt, not the requester            | Numbers `RF/{campus}/{FY}/{00001}`, posts the ledger journal                                                   |
+| POST          | /fees/refunds/:id/reject                      | fees.cancel_receipt                               |                                                                                                                |
+| GET           | /public/pay/:token                            | public, rate-limited                              | Parent page data: student first name and class, amount, school account, UPI link, uploads                      |
+| POST          | /public/pay/:token/proof                      | public, rate-limited (20/h per IP, 10/h per link) | multipart: file, amount, mode, reference (UTR), paidOn, payerName, payerPhone; duplicate UTR → 409             |
+| GET           | /public/pay/:token/receipts/:proofId          | public                                            | Receipt PDF after approval                                                                                     |
 
 ## Parent portal — access and family view (Phase 7a)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| POST | /auth/login | public | Body has `email` **or** `phone` (10-digit Indian numbers are normalised to +91) plus `password` |
-| GET | /students/:id/portal-access | portal.manage or students.view | Guardians with status none / invited / active |
-| POST | /portal/invites | portal.manage | `{ guardianId, purpose: activate \| reset }`; returns the link once and a WhatsApp message. Reset only for parent-only accounts used by this school alone |
-| POST | /portal/guardians/:id/revoke | portal.manage | Unlinks the guardian; drops the Parent role (and membership) when nothing else is left |
-| POST | /portal/activate/peek | public, rate-limited | `{ token }` → school, guardian first name, masked mobile, whether the number already has an account |
-| POST | /portal/activate | public, rate-limited | `{ token, password }`: new password (≥ 8 chars), or the existing account's password to add this school; signs in |
-| GET | /family | family.portal | Linked children with class, today's attendance, fees due now and outstanding |
-| GET | /family/children/:id/attendance | family.portal | Year totals, months, day-by-day records, leave |
-| GET | /family/children/:id/fees | family.portal | Demands, receipts, uploaded payment proofs, whether online payment is on |
-| POST | /family/children/:id/pay | family.portal | Creates a 3-day payment link for the parent (pay-to-school flow from Phase 6c) |
-| GET | /family/receipts/:id/receipt.pdf | family.portal | Only receipts of linked children |
+| Method | Path                             | Permission                     | Notes                                                                                                                                                     |
+| ------ | -------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | /auth/login                      | public                         | Body has `email` **or** `phone` (10-digit Indian numbers are normalised to +91) plus `password`                                                           |
+| GET    | /students/:id/portal-access      | portal.manage or students.view | Guardians with status none / invited / active                                                                                                             |
+| POST   | /portal/invites                  | portal.manage                  | `{ guardianId, purpose: activate \| reset }`; returns the link once and a WhatsApp message. Reset only for parent-only accounts used by this school alone |
+| POST   | /portal/guardians/:id/revoke     | portal.manage                  | Unlinks the guardian; drops the Parent role (and membership) when nothing else is left                                                                    |
+| POST   | /portal/activate/peek            | public, rate-limited           | `{ token }` → school, guardian first name, masked mobile, whether the number already has an account                                                       |
+| POST   | /portal/activate                 | public, rate-limited           | `{ token, password }`: new password (≥ 8 chars), or the existing account's password to add this school; signs in                                          |
+| GET    | /family                          | family.portal                  | Linked children with class, today's attendance, fees due now and outstanding                                                                              |
+| GET    | /family/children/:id/attendance  | family.portal                  | Year totals, months, day-by-day records, leave                                                                                                            |
+| GET    | /family/children/:id/fees        | family.portal                  | Demands, receipts, uploaded payment proofs, whether online payment is on                                                                                  |
+| POST   | /family/children/:id/pay         | family.portal                  | Creates a 3-day payment link for the parent (pay-to-school flow from Phase 6c)                                                                            |
+| GET    | /family/receipts/:id/receipt.pdf | family.portal                  | Only receipts of linked children                                                                                                                          |
 
 ## Staff and teaching (Phase 8)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| POST | /members/invite | members.manage | `email` **or** `phone`, `fullName`, `designation`, `assignments`; a mobile invite returns `link` for WhatsApp; a parent of the school gets staff roles added |
-| PUT | /members/:id/profile | members.manage | designation, employeeCode (unique), phone, joinedOn |
-| GET | /teaching/grid?campusId&academicYearId | academic.view | Classes → sections, subjects, class teachers, assignments, teacher load |
-| PUT | /teaching/cell | academic.manage | `{ sectionId, subjectId, membershipIds }` replaces that cell; subject must be taught in the class |
-| GET | /teaching/mine | any staff | Class-teacher and subject sections this year, with today's attendance status |
-| GET | /teaching/sections/:id/students | class teacher, subject teacher of that section, or students.view | Subject teachers: roll, name, admission no.; class teacher/office also parent phone |
+| Method | Path                                   | Permission                                                       | Notes                                                                                                                                                        |
+| ------ | -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| POST   | /members/invite                        | members.manage                                                   | `email` **or** `phone`, `fullName`, `designation`, `assignments`; a mobile invite returns `link` for WhatsApp; a parent of the school gets staff roles added |
+| PUT    | /members/:id/profile                   | members.manage                                                   | designation, employeeCode (unique), phone, joinedOn                                                                                                          |
+| GET    | /teaching/grid?campusId&academicYearId | academic.view                                                    | Classes → sections, subjects, class teachers, assignments, teacher load                                                                                      |
+| PUT    | /teaching/cell                         | academic.manage                                                  | `{ sectionId, subjectId, membershipIds }` replaces that cell; subject must be taught in the class                                                            |
+| GET    | /teaching/mine                         | any staff                                                        | Class-teacher and subject sections this year, with today's attendance status                                                                                 |
+| GET    | /teaching/sections/:id/students        | class teacher, subject teacher of that section, or students.view | Subject teachers: roll, name, admission no.; class teacher/office also parent phone                                                                          |
 
 ## Setup workbook and sign-in pages (Phase 9a)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| POST | /auth/login | public | Optional `as: staff \| parent` (staff page / parent page); refuses the wrong kind of account with 403 |
-| GET | /setup-imports/template | academic.manage | The .xlsx template |
-| POST | /setup-imports?campusId&academicYearId | academic.manage (+ members.manage for a Staff sheet) | multipart `file`; returns summary, problems by sheet/row, plan |
-| GET | /setup-imports?campusId | academic.manage | Last 20 imports |
-| POST | /setup-imports/:id/apply | academic.manage | One transaction; returns counts and staff WhatsApp links (shown once) |
-| POST | /setup-imports/:id/undo | academic.manage | Removes what the import added; refused once students are in its sections |
-| POST | /setup-imports/:id/cancel | academic.manage | Drop a preview |
+| Method | Path                                   | Permission                                           | Notes                                                                                                 |
+| ------ | -------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| POST   | /auth/login                            | public                                               | Optional `as: staff \| parent` (staff page / parent page); refuses the wrong kind of account with 403 |
+| GET    | /setup-imports/template                | academic.manage                                      | The .xlsx template                                                                                    |
+| POST   | /setup-imports?campusId&academicYearId | academic.manage (+ members.manage for a Staff sheet) | multipart `file`; returns summary, problems by sheet/row, plan                                        |
+| GET    | /setup-imports?campusId                | academic.manage                                      | Last 20 imports                                                                                       |
+| POST   | /setup-imports/:id/apply               | academic.manage                                      | One transaction; returns counts and staff WhatsApp links (shown once)                                 |
+| POST   | /setup-imports/:id/undo                | academic.manage                                      | Removes what the import added; refused once students are in its sections                              |
+| POST   | /setup-imports/:id/cancel              | academic.manage                                      | Drop a preview                                                                                        |
 
 ## Old fee balances (Phase 9b)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| GET | /opening-balances/template | fees.configure | CSV: Admission no, Name, Previous dues, Advance |
-| POST | /opening-balances?campusId | fees.configure | multipart `file` (.csv/.xlsx); matches students by admission no. in the current year; returns rows and problems |
-| GET | /opening-balances?campusId | fees.configure | Past imports |
-| POST | /opening-balances/:id/apply | fees.configure | Dues → "Previous year dues" demand; advance → payment (mode `opening`, receipt `OB/…`), not counted as today's collection |
-| POST | /opening-balances/:id/undo | fees.configure | Refused once any of those dues were paid or an advance was used |
-| POST | /opening-balances/:id/cancel | fees.configure | Drop a preview |
+| Method | Path                         | Permission     | Notes                                                                                                                     |
+| ------ | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| GET    | /opening-balances/template   | fees.configure | CSV: Admission no, Name, Previous dues, Advance                                                                           |
+| POST   | /opening-balances?campusId   | fees.configure | multipart `file` (.csv/.xlsx); matches students by admission no. in the current year; returns rows and problems           |
+| GET    | /opening-balances?campusId   | fees.configure | Past imports                                                                                                              |
+| POST   | /opening-balances/:id/apply  | fees.configure | Dues → "Previous year dues" demand; advance → payment (mode `opening`, receipt `OB/…`), not counted as today's collection |
+| POST   | /opening-balances/:id/undo   | fees.configure | Refused once any of those dues were paid or an advance was used                                                           |
+| POST   | /opening-balances/:id/cancel | fees.configure | Drop a preview                                                                                                            |
 
 ## Timetable, homework, notices (Phase 10)
 
-| Method | Path | Permission | Notes |
-| --- | --- | --- | --- |
-| GET | /timetable/slots?campusId | any member | The bell |
-| PUT | /timetable/slots | timetable.manage | Whole bell; send ids back to keep periods; up to 16, in time order |
-| GET | /timetable/sections/:id | any member who can see the section | Week grid, class subjects with default teacher |
-| PUT | /timetable/sections/:id/cell | timetable.manage | `{weekday 1-6, slotId, subjectId \| null, membershipId?}`; teacher defaults from Who-teaches-what; 409 if the teacher is busy elsewhere |
-| GET | /timetable/mine?date | any member | My periods that day, incl. covers |
-| GET | /timetable/teachers/:membershipId/day?campusId&date | timetable.manage | Their periods with free teachers per period |
-| PUT | /timetable/substitutions | timetable.manage | `{onDate, entryId, substituteMembershipId \| null}`; 409 if the substitute is busy |
-| POST | /homework | subject teacher, class teacher or academic.manage | multipart: sectionId, subjectId, title, details, dueOn, optional `file` (photo/PDF ≤ 5 MB) |
-| GET | /homework?sectionId | can see the section | Recent homework |
-| DELETE | /homework/:id | the teacher who gave it or academic.manage | Soft remove |
-| GET | /notices | notices.manage | With read counts |
-| GET | /notices/feed | any member | Published notices for staff |
-| POST | /notices; PUT /notices/:id | notices.manage | audience everyone/parents/staff; optional classes/sections; drafts only editable |
-| POST | /notices/:id/publish, /archive | notices.manage | Publish emits `notice.published` |
-| POST | /notices/:id/read | any member | Marks read |
-| GET | /family/children/:id/homework | family.portal | |
-| GET | /family/notices | family.portal | Only notices for this parent's children's classes |
-| POST | /family/children/:id/leave | family.portal | `{fromDate, toDate, reason}`; up to 30 days, from at most 7 days back; class teacher decides in Attendance → Leave |
-| POST | /family/leave/:id/cancel | family.portal | Pending requests only |
+| Method | Path                                                | Permission                                        | Notes                                                                                                                                   |
+| ------ | --------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | /timetable/slots?campusId                           | any member                                        | The bell                                                                                                                                |
+| PUT    | /timetable/slots                                    | timetable.manage                                  | Whole bell; send ids back to keep periods; up to 16, in time order                                                                      |
+| GET    | /timetable/sections/:id                             | any member who can see the section                | Week grid, class subjects with default teacher                                                                                          |
+| PUT    | /timetable/sections/:id/cell                        | timetable.manage                                  | `{weekday 1-6, slotId, subjectId \| null, membershipId?}`; teacher defaults from Who-teaches-what; 409 if the teacher is busy elsewhere |
+| GET    | /timetable/mine?date                                | any member                                        | My periods that day, incl. covers                                                                                                       |
+| GET    | /timetable/teachers/:membershipId/day?campusId&date | timetable.manage                                  | Their periods with free teachers per period                                                                                             |
+| PUT    | /timetable/substitutions                            | timetable.manage                                  | `{onDate, entryId, substituteMembershipId \| null}`; 409 if the substitute is busy                                                      |
+| POST   | /homework                                           | subject teacher, class teacher or academic.manage | multipart: sectionId, subjectId, title, details, dueOn, optional `file` (photo/PDF ≤ 5 MB)                                              |
+| GET    | /homework?sectionId                                 | can see the section                               | Recent homework                                                                                                                         |
+| DELETE | /homework/:id                                       | the teacher who gave it or academic.manage        | Soft remove                                                                                                                             |
+| GET    | /notices                                            | notices.manage                                    | With read counts                                                                                                                        |
+| GET    | /notices/feed                                       | any member                                        | Published notices for staff                                                                                                             |
+| POST   | /notices; PUT /notices/:id                          | notices.manage                                    | audience everyone/parents/staff; optional classes/sections; drafts only editable                                                        |
+| POST   | /notices/:id/publish, /archive                      | notices.manage                                    | Publish emits `notice.published`                                                                                                        |
+| POST   | /notices/:id/read                                   | any member                                        | Marks read                                                                                                                              |
+| GET    | /family/children/:id/homework                       | family.portal                                     |                                                                                                                                         |
+| GET    | /family/notices                                     | family.portal                                     | Only notices for this parent's children's classes                                                                                       |
+| POST   | /family/children/:id/leave                          | family.portal                                     | `{fromDate, toDate, reason}`; up to 30 days, from at most 7 days back; class teacher decides in Attendance → Leave                      |
+| POST   | /family/leave/:id/cancel                            | family.portal                                     | Pending requests only                                                                                                                   |
 
 ## Exams (Phase 11)
 
-| Method | Path | Who | Notes |
-| --- | --- | --- | --- |
-| GET | /exams?campusId | any member | Current year's exams with handed-in progress |
-| POST | /exams | exams.manage | `{campusId, name, termId?, startsOn?, endsOn?}` |
-| GET / PATCH / DELETE | /exams/:id | view: academic.view; change: exams.manage | Delete only drafts |
-| POST | /exams/:id/status | exams.manage | `draft → open → published`; published → open takes results back |
-| PUT | /exams/:id/papers | exams.manage | One class's date sheet `{gradeLevelId, papers[]}` |
-| GET | /exams/marks/mine | any member | Papers this teacher has to enter in open exams |
-| GET / PUT | /exams/papers/:paperId/sections/:sectionId | subject teacher or exams.manage | Marks register; PUT `{marks:[{enrollmentId, status, marks}]}` |
-| POST | …/submit, …/reopen | teacher / exams.manage | Hand in (locks) / reopen |
-| GET | /exams/:id/sections/:sectionId/results | class teacher or office | Totals, grades, rank |
-| PUT | /exams/:id/sections/:sectionId/remarks | class teacher or exams.manage | |
-| GET | /exams/:id/students/:studentId/report-card.pdf | class teacher or office | |
-| GET | /family/children/:id/results | family.portal | Published exams only |
-| GET | /family/children/:id/results/:examId/report-card.pdf | family.portal | |
+| Method               | Path                                                 | Who                                       | Notes                                                           |
+| -------------------- | ---------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| GET                  | /exams?campusId                                      | any member                                | Current year's exams with handed-in progress                    |
+| POST                 | /exams                                               | exams.manage                              | `{campusId, name, termId?, startsOn?, endsOn?}`                 |
+| GET / PATCH / DELETE | /exams/:id                                           | view: academic.view; change: exams.manage | Delete only drafts                                              |
+| POST                 | /exams/:id/status                                    | exams.manage                              | `draft → open → published`; published → open takes results back |
+| PUT                  | /exams/:id/papers                                    | exams.manage                              | One class's date sheet `{gradeLevelId, papers[]}`               |
+| GET                  | /exams/marks/mine                                    | any member                                | Papers this teacher has to enter in open exams                  |
+| GET / PUT            | /exams/papers/:paperId/sections/:sectionId           | subject teacher or exams.manage           | Marks register; PUT `{marks:[{enrollmentId, status, marks}]}`   |
+| POST                 | …/submit, …/reopen                                   | teacher / exams.manage                    | Hand in (locks) / reopen                                        |
+| GET                  | /exams/:id/sections/:sectionId/results               | class teacher or office                   | Totals, grades, rank                                            |
+| PUT                  | /exams/:id/sections/:sectionId/remarks               | class teacher or exams.manage             |                                                                 |
+| GET                  | /exams/:id/students/:studentId/report-card.pdf       | class teacher or office                   |                                                                 |
+| GET                  | /family/children/:id/results                         | family.portal                             | Published exams only                                            |
+| GET                  | /family/children/:id/results/:examId/report-card.pdf | family.portal                             |                                                                 |
 
 ## Platform — hidden (404) from non-staff
 
