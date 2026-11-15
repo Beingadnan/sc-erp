@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Every colour in the app comes from here or from Tailwind's slate scale
+ * (neutrals) plus emerald / amber / red for status. Do not introduce other hues.
+ */
+@theme {
+  /*
+   * Fluent 2 style (see docs/product/design-system.md). Microsoft "communication blue" for the
+   * brand and Fluent's neutral greys in place of Tailwind's bluish slate, so every page that uses
+   * brand-* / slate-* classes picks up the new look.
+   */
+  --color-brand-50: #ebf3fc;
+  --color-brand-100: #cfe4fa;
+  --color-brand-200: #b4d6fa;
+  --color-brand-300: #77b7f7;
+  --color-brand-400: #479ef5;
+  --color-brand-500: #2886de;
+  --color-brand-600: #0f6cbd;
+  --color-brand-700: #115ea3;
+  --color-brand-800: #0f548c;
+  --color-brand-900: #0c3b5e;
+
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f0f0f0;
+  --color-slate-200: #e0e0e0;
+  --color-slate-300: #d1d1d1;
+  --color-slate-400: #8f8f8f;
+  --color-slate-500: #707070;
+  --color-slate-600: #616161;
+  --color-slate-700: #424242;
+  --color-slate-800: #303030;
+  --color-slate-900: #242424;
+  --color-slate-950: #1b1b1b;
+
+  --color-canvas: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-ink: #242424;
+  --color-muted: #616161;
+  --color-line: #e0e0e0;
+
+  /* Windows' own font first (most school PCs), then system fonts; Devanagari for Hindi names. */
+  --font-sans:
+    'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Roboto,
+    'Noto Sans', 'Noto Sans Devanagari', 'Nirmala UI', sans-serif;
+
+  /* Fluent corner radii: 4px controls, 8px cards, 12px dialogs. */
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+
+  --shadow-xs: 0 0 2px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.14);
+  --shadow-card: 0 0 2px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.14);
+  --shadow-pop: 0 0 2px rgb(0 0 0 / 0.12), 0 8px 16px rgb(0 0 0 / 0.14);
+  --shadow-lg: 0 0 2px rgb(0 0 0 / 0.12), 0 8px 16px rgb(0 0 0 / 0.14);
+  --shadow-xl: 0 0 8px rgb(0 0 0 / 0.12), 0 28px 32px rgb(0 0 0 / 0.14);
+
+  --animate-fade-in: fade-in 120ms ease-out;
+  --animate-pop-in: pop-in 140ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  --animate-slide-in-left: slide-in-left 180ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  --animate-toast-in: toast-in 180ms cubic-bezier(0.2, 0.9, 0.3, 1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+  }
+
+  /* Native checkboxes / radios used across forms pick up the brand colour. */
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--color-brand-600);
+    width: 1rem;
+    height: 1rem;
+  }
+
+  :focus-visible {
+    outline: 2px solid #242424;
+    outline-offset: 1px;
+    border-radius: 4px;
+  }
+
+  body {
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Phones: bigger tap targets for form controls. */
+  @media (pointer: coarse) {
+    .ui-control {
+      height: 2.75rem;
+      font-size: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Shared control look for inputs, selects and textareas written by hand in pages. */
+  .ui-control {
+    height: 2rem;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #d1d1d1;
+    border-bottom-color: #616161;
+    background: #fff;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+    transition:
+      border-color 120ms,
+      box-shadow 120ms;
+  }
+  .ui-control::placeholder {
+    color: #707070;
+  }
+  .ui-control:hover:not(:disabled) {
+    border-color: #c7c7c7;
+    border-bottom-color: #575757;
+  }
+  .ui-control:focus {
+    outline: none;
+    border-bottom-color: var(--color-brand-600);
+    box-shadow: inset 0 -1px 0 var(--color-brand-600);
+  }
+  .ui-control:disabled {
+    background: #fafafa;
+    color: #707070;
+    cursor: not-allowed;
+  }
+  .ui-control[aria-invalid='true'] {
+    border-bottom-color: #c50f1f;
+  }
+  .ui-control[aria-invalid='true']:focus {
+    box-shadow: inset 0 -1px 0 #c50f1f;
+  }
+  select.ui-control {
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23616161' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+  textarea.ui-control {
+    height: auto;
+    min-height: 5rem;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.5;
+  }
+}

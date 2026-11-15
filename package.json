@@ -1,0 +1,39 @@
+{
+  "name": "school-erp",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "node scripts/free-ports.mjs && turbo run dev --parallel --filter=@school-erp/api --filter=@school-erp/web",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test --concurrency=1",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:migrate": "pnpm --filter @school-erp/db migrate",
+    "db:setup-app-role": "pnpm --filter @school-erp/db setup-app-role",
+    "db:check-rls": "pnpm --filter @school-erp/db check-rls",
+    "db:generate": "pnpm --filter @school-erp/db generate",
+    "dev:worker": "pnpm --filter @school-erp/worker dev",
+    "db:setup": "pnpm --filter \"./packages/*\" build && pnpm db:migrate && pnpm db:setup-app-role && pnpm db:check-rls"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "zod@<4.6.6": "4.6.7",
+      "uuid@<11.1.1": "11.1.1"
+    }
+  }
+}

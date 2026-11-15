@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Every push: lint, typecheck, build, and the full test suite (incl. tenant isolation)
+  # against a Postgres service that mirrors Neon's role model.
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL_OWNER: postgresql://erp_owner:erp_owner@localhost:5432/school_erp_test
+      TEST_DATABASE_URL_APP: postgresql://erp_app:erp_app_test_password_123@localhost:5432/school_erp_test
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Create Neon-like roles
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -f infrastructure/docker/postgres-init.sql
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test
+      - name: RLS coverage check
+        run: DATABASE_URL_OWNER=$TEST_DATABASE_URL_OWNER pnpm db:check-rls
+      - name: Dependency audit
+        run: pnpm audit --prod --audit-level high
+
+  # Pull requests: run migrations + isolation suite on a throwaway Neon branch, through
+  # Neon's real PgBouncer pooler. Skipped until the NEON_* secrets are configured.
+  neon-branch:
+    if: github.event_name == 'pull_request' && vars.NEON_PROJECT_ID != ''
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Create Neon branch
+        id: branch
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: ci/pr-${{ github.event.number }}-${{ github.run_id }}
+          parent_branch: dev
+          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: Migrate and test on the Neon branch
+        env:
+          TEST_DATABASE_URL_OWNER: ${{ steps.branch.outputs.db_url }}
+          TEST_ERP_APP_PASSWORD: ${{ secrets.NEON_CI_APP_PASSWORD }}
+        run: |
+          pnpm --filter "./packages/*" build
+          export TEST_DATABASE_URL_APP=$(node -e "const u=new URL(process.env.TEST_DATABASE_URL_OWNER);u.username='erp_app';u.password=process.env.TEST_ERP_APP_PASSWORD;u.hostname=u.hostname.replace(/^([^.]+)/,'\$1-pooler');console.log(u.toString())")
+          pnpm --filter @school-erp/db test
+          DATABASE_URL_OWNER=$TEST_DATABASE_URL_OWNER pnpm db:check-rls
+      - name: Delete Neon branch
+        if: always()
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: ci/pr-${{ github.event.number }}-${{ github.run_id }}
+          api_key: ${{ secrets.NEON_API_KEY }}
