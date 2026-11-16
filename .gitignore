@@ -25,3 +25,6 @@ dev-log.txt
 .ui-backup/
 tmpstage/
 .vercel
+
+# Vercel env files with secrets (never commit)
+vercel-env-*.txt
